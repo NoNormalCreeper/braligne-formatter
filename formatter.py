@@ -1,7 +1,8 @@
-from itertools import count
+from tokenize import group
 from typing import List
 from typing import Union
 from typing import Optional
+import re
 
 
 class Tools:
@@ -25,6 +26,17 @@ class Formatter:
         else:
             raise TypeError(f'Unsupported type: {type(file)}')
     
+    def _remove_unecessary_spaces(self, lines: List[str]) -> List[str]:
+        pattern = r"\}(\s+)\w."
+        for index, line in enumerate(lines):
+            matches = re.finditer(pattern, line)
+            for match_num, match in enumerate(matches, start=1):
+                print(match.start(), match.end())
+                line_ = list(line)
+                line_[match.start(1):match.end(1)] = ''
+                lines[index] = ''.join(line_)
+        return lines
+    
     def _move_last_letter(self, lines: List[str], letter, align_position) -> List[str]:
         for index, line in enumerate(lines):
             if line.endswith(letter):
@@ -40,7 +52,6 @@ class Formatter:
                 count_of_right_braces = line.count('}')
                 line = line.replace('}', '')
                 backward_lines[index+1] += '}' * count_of_right_braces
-                # if nothing left in line, remove it
                 if not line.strip():
                     line = ''
                 backward_lines[index] = line
@@ -51,6 +62,7 @@ class Formatter:
         content = self.content
         lines: list = content.splitlines()
         align_position = max(len(line) for line in lines) + 2
+        lines = self._remove_unecessary_spaces(lines)
         lines = self._move_last_letter(lines, ';', align_position)
         lines = self._move_last_letter(lines, '{', align_position)
         lines = self._move_right_braces(lines, align_position)
