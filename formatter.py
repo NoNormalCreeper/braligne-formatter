@@ -1,4 +1,3 @@
-from tokenize import group
 from typing import List
 from typing import Union
 from typing import Optional
@@ -31,7 +30,6 @@ class Formatter:
         for index, line in enumerate(lines):
             matches = re.finditer(pattern, line)
             for match_num, match in enumerate(matches, start=1):
-                print(match.start(), match.end())
                 line_ = list(line)
                 line_[match.start(1):match.end(1)] = ''
                 lines[index] = ''.join(line_)
@@ -58,6 +56,18 @@ class Formatter:
         lines = backward_lines[::-1]
         return lines
 
+    def _final_fix(self, lines: List[str], align_position) -> List[str]:
+        pattern = r"(.+?)(\s+)(\{|\}|\;)"
+        for index, line in enumerate(lines):
+            try:
+                result = re.search(pattern, line).groups()
+                num_of_missing_space = align_position - len(result[0]) - len(result[1]) - 1
+                line = line.replace(result[0], result[0] + ' ' * num_of_missing_space)
+                lines[index] = line
+            except:
+                pass
+        return lines
+
     def format(self) -> str:
         content = self.content
         lines: list = content.splitlines()
@@ -66,5 +76,6 @@ class Formatter:
         lines = self._move_last_letter(lines, ';', align_position)
         lines = self._move_last_letter(lines, '{', align_position)
         lines = self._move_right_braces(lines, align_position)
+        lines = self._final_fix(lines, align_position)
         
         return tools.joinlines(lines)
