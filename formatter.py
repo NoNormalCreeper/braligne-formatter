@@ -23,34 +23,21 @@ class Formatter:
         else:
             raise TypeError(f'Unsupported type: {type(file)}')
     
-    def move_semicolons(self, align_position) -> str:
+    def _move_last_letter(self, letter, align_position):
         lines = self._lines
         for index, line in enumerate(lines):
-            if line.endswith(';'):
+            if line.endswith(letter):
                 line = line[:-1]
-                line = line.ljust(align_position-1) + ';'
+                line = line.ljust(align_position - 1) + letter
                 lines[index] = line
         return lines
-    
+
     def format(self) -> str:
         content = self.content
         lines: list = content.splitlines()
         self._lines = lines
         align_position = max(len(line) for line in lines) + 2
-        lines = self.move_semicolons(align_position)
+        lines = self._move_last_letter(';', align_position)
+        lines = self._move_last_letter('{', align_position)
         
         return tools.joinlines(lines)
-
-
-'''
-e.g.
-
-    foo(123);
-            ^
-            len(line)
-    foo(123)     ;
-                 ^
-                 align_position
-            |<->|
-            align_position - len(line)
-'''
