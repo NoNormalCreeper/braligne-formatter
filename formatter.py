@@ -9,7 +9,13 @@ class Tools:
         pass
     
     def joinlines(self, lines: list, joiner: str = "\n") -> str:
-        return joiner.join(lines)
+        result = ""
+        for index in range(len(lines)):
+            if lines[index]:
+                result += lines[index]
+                if index != len(lines) - 1:
+                    result += joiner
+        return result
 
 tools = Tools()
     
