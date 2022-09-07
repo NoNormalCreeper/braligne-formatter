@@ -13,6 +13,8 @@ This idea comes from a meme:
 **BEFORE**
 
 ```java
+import java.io.InputStream;
+import java.io.FileInputStream;
 public class loadFiles {
     public static void main(String args[]) {
         try {
